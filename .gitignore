@@ -1,0 +1,28 @@
+# Build output
+build/
+build-native/
+out/
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.exe
+
+# Local AI/runtime data
+models/
+core-data/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+core.config
+
+# IDE/editor
+.vscode/
+.idea/
+.vs/
+
+# OS
+.DS_Store
+Thumbs.db

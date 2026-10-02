@@ -1,0 +1,3 @@
+# CORE AI configuration
+# Copy to core.config and change values as needed.
+model=llama3.2
