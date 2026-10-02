@@ -1,0 +1,3 @@
+#include "core/Config.h"
+#include <fstream>
+namespace core { bool Config::load(const std::string&p){ std::ifstream f(p); if(!f)return false; std::string l; while(std::getline(f,l)){auto x=l.find('=');if(x!=std::string::npos)v_[l.substr(0,x)]=l.substr(x+1);} return true;} bool Config::save(const std::string&p)const{std::ofstream f(p);if(!f)return false;for(auto&[k,v]:v_)f<<k<<'='<<v<<'\n';return true;} void Config::set(std::string k,std::string v){v_[std::move(k)]=std::move(v);} std::string Config::get(const std::string&k,const std::string&d)const{auto i=v_.find(k);return i==v_.end()?d:i->second;} }

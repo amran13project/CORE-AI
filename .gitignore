@@ -1,0 +1,17 @@
+build/
+build-native/
+out/
+*.exe
+*.dll
+*.obj
+*.o
+*.a
+*.lib
+core.log
+audit.log
+memory.db.txt
+core.config
+models/
+node_modules/
+.DS_Store
+Thumbs.db
