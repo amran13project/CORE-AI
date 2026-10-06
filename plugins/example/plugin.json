@@ -1,8 +1,0 @@
-{
-  "id": "core.example.hello",
-  "name": "CORE AI Example Plugin",
-  "version": "0.1.0",
-  "api": 1,
-  "entry": "core_example_plugin",
-  "permissions": []
-}

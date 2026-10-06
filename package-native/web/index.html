@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CORE-AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="CORE-AI navigation">
+      <div class="sidebar-top">
+        <div class="brand-row">
+          <button class="icon-button mobile-only" id="closeSidebar" aria-label="Close sidebar">×</button>
+          <div class="brand-mark">C</div>
+          <div class="brand-copy"><strong>CORE-AI</strong><span>Personal AI</span></div>
+        </div>
+        <button class="new-chat-button" id="newBtn">
+          <span class="new-chat-icon">+</span>
+          <span>New chat</span>
+        </button>
+        <button class="sidebar-action" id="searchBtn">
+          <span class="side-icon">⌕</span><span>Search chats</span><kbd>Ctrl K</kbd>
+        </button>
+      </div>
+
+      <div class="nav-scroll">
+        <div class="section-label">Workspace</div>
+        <nav id="nav" aria-label="Workspace"></nav>
+        <div class="section-label recent-label">Recent</div>
+        <div id="recentList" class="recent-list" aria-live="polite"></div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="sidebar-action" id="settingsShortcut"><span class="side-icon">⚙</span><span>Settings</span></button>
+        <div class="account-row">
+          <div class="account-avatar">C</div>
+          <div class="account-copy"><strong>CORE user</strong><span id="storageLabel">Local storage</span></div>
+          <span class="account-dot" title="Local-first"></span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <main class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="openSidebar" aria-label="Open sidebar">☰</button>
+          <div class="chat-title-wrap">
+            <div class="chat-title" id="title">New chat</div>
+            <div class="chat-subtitle" id="status">Connecting to CORE-AI…</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <label class="model-control">
+            <span class="sr-only">Model</span>
+            <select id="model" aria-label="Model"></select>
+          </label>
+          <button class="icon-button" id="resetBtn" title="Reset current chat" aria-label="Reset current chat">↻</button>
+        </div>
+      </header>
+
+      <section class="chat-scroll" id="chatScroll">
+        <div class="chat-column" id="content"></div>
+      </section>
+
+      <form id="composer" class="composer-wrap" autocomplete="off">
+        <div class="composer-shell">
+          <div class="composer-main">
+            <div class="composer-left">
+              <button type="button" class="composer-icon" id="plusBtn" aria-label="Add" aria-haspopup="menu" aria-expanded="false">+</button>
+              <div class="popup-menu" id="plusMenu" hidden>
+                <button type="button" data-plus-action="plugin"><span>◈</span>Plugins</button>
+                <button type="button" data-plus-action="tools"><span>⌁</span>Tools</button>
+                <button type="button" data-plus-action="files"><span>□</span>Files</button>
+                <button type="button" data-plus-action="images"><span>◉</span>Images</button>
+                <button type="button" data-plus-action="library"><span>▤</span>Library</button>
+              </div>
+            </div>
+
+            <textarea id="input" rows="1" placeholder="Message CORE-AI…" aria-label="Message CORE-AI"></textarea>
+
+            <div class="composer-right">
+              <button type="button" class="composer-tool" id="functionBtn" aria-haspopup="menu" aria-expanded="false">Function</button>
+              <div class="popup-menu function-menu" id="functionMenu" hidden>
+                <button type="button" data-fn="think">Think</button>
+                <button type="button" data-fn="codex">Codex</button>
+                <button type="button" data-fn="maps">Maps</button>
+                <button type="button" data-fn="research">Research</button>
+                <button type="button" data-fn="new-chat">New Chat</button>
+                <button type="button" data-fn="reset-chat">Reset Chat</button>
+              </div>
+              <button type="button" class="composer-icon" id="micBtn" aria-label="Voice input" title="Voice input">⌁</button>
+              <button type="button" class="think-button" id="thinkBtn" aria-pressed="false">Think</button>
+              <button type="submit" class="send-button" id="send" aria-label="Send message">↑</button>
+            </div>
+          </div>
+          <div class="composer-meta"><span>Enter to send</span><span>Shift + Enter for new line</span></div>
+        </div>
+        <div class="composer-footnote">CORE-AI can make mistakes. Verify important information.</div>
+      </form>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

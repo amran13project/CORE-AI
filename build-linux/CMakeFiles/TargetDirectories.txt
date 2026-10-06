@@ -1,0 +1,12 @@
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/coreai.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/core-ai.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/core-ai-tests.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/package.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/package_source.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/test.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/edit_cache.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/rebuild_cache.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/list_install_components.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/install.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/install/local.dir
+/mnt/data/core-ai-build/v18/build-linux/CMakeFiles/install/strip.dir

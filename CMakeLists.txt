@@ -1,60 +1,55 @@
 cmake_minimum_required(VERSION 3.20)
-project(COREAI VERSION 0.2.0 LANGUAGES CXX)
+project(COREAI VERSION 0.3.2 LANGUAGES CXX)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-option(CORE_BUILD_TESTS "Build tests" ON)
-option(CORE_BUILD_SINGLE_FILE "Build single-file CORE-AI.cpp" OFF)
+
+option(COREAI_BUILD_TESTS "Build tests" ON)
+option(COREAI_BUILD_NATIVE_GUI "Build native Windows GUI" ON)
 
 add_library(coreai STATIC
-  src/core/CoreApp.cpp
-  src/core/Config.cpp
-  src/core/Logger.cpp
-  src/core/EventBus.cpp
-  src/ai/ModelRouter.cpp
-  src/ai/OllamaProvider.cpp
-  src/memory/MemoryStore.cpp
-  src/tools/ToolRegistry.cpp
-  src/tools/FileTool.cpp
-  src/tools/ProcessTool.cpp
-  src/agents/Planner.cpp
-  src/agents/AgentManager.cpp
-  src/security/PermissionManager.cpp
-  src/audit/AuditLog.cpp
-  src/verification/VerificationEngine.cpp
-  src/projects/ProjectManager.cpp
-  src/automation/WorkflowEngine.cpp
-  src/plugins/PluginManager.cpp
-  src/server/LocalApiServer.cpp
-  src/core/CoreCAPI.cpp
-  src/adapters/web/WebSearchAdapter.cpp
-  src/adapters/maps/MapsAdapter.cpp
-  src/adapters/vision/VisionAdapter.cpp
-  src/adapters/image/ImageGenerationAdapter.cpp
-  src/adapters/voice/VoiceAdapter.cpp
+    src/core/RuntimePaths.cpp
+    src/core/UserStorage.cpp
+    src/core/Logger.cpp
+    src/core/Config.cpp
+    src/core/Database.cpp
+    src/core/Capabilities.cpp
+    src/providers/OllamaProvider.cpp
+    src/services/CoreApp.cpp
+    src/services/LocalApiServer.cpp
+    src/services/LocalFeatures.cpp
 )
+
 target_include_directories(coreai PUBLIC include src)
+
 if(WIN32)
-  target_link_libraries(coreai PUBLIC ws2_32 shell32 user32 advapi32)
+    target_link_libraries(coreai PUBLIC ws2_32 user32 shell32 advapi32)
 else()
-  target_link_libraries(coreai PUBLIC dl)
+    target_link_libraries(coreai PUBLIC dl pthread)
 endif()
+
 add_executable(core-ai src/main.cpp)
 target_link_libraries(core-ai PRIVATE coreai)
 
-if(CORE_BUILD_SINGLE_FILE)
-  add_executable(core-ai-single CORE-AI.cpp)
-  target_compile_definitions(core-ai-single PRIVATE CORE_SINGLE_FILE_BUILD=1)
-  if(WIN32)
-    target_link_libraries(core-ai-single PRIVATE winhttp shell32 advapi32 user32 gdi32)
-  endif()
+if(WIN32 AND COREAI_BUILD_NATIVE_GUI)
+    target_sources(core-ai PRIVATE src/gui/Win32Gui.cpp)
+    target_compile_definitions(core-ai PRIVATE COREAI_HAS_NATIVE_GUI=1)
 endif()
 
-if(CORE_BUILD_TESTS)
-  enable_testing()
-  add_executable(core-ai-tests tests/core_tests.cpp)
-  target_link_libraries(core-ai-tests PRIVATE coreai)
-  add_test(NAME CoreAITests COMMAND core-ai-tests)
-  add_executable(core-ai-adapter-tests tests/adapter_tests.cpp src/adapters/web/WebSearchAdapter.cpp src/adapters/maps/MapsAdapter.cpp)
-  add_test(NAME CoreAIAdapterTests COMMAND core-ai-adapter-tests)
+if(COREAI_BUILD_TESTS)
+    enable_testing()
+    add_executable(core-ai-tests tests/core_tests.cpp)
+    target_link_libraries(core-ai-tests PRIVATE coreai)
+    add_test(NAME COREAI.UnitIntegration COMMAND core-ai-tests)
 endif()
+
+install(TARGETS core-ai RUNTIME DESTINATION bin)
+install(DIRECTORY web/ DESTINATION web)
+install(DIRECTORY docs/ DESTINATION docs)
+install(FILES README.md BUILD.md SECURITY.md CONFIGURATION.md DESTINATION .)
+
+set(CPACK_PACKAGE_NAME "CORE-AI")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_GENERATOR ZIP)
+include(CPack)

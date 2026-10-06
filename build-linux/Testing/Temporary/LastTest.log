@@ -1,0 +1,78 @@
+Start testing: Oct 06 04:13 UTC
+----------------------------------------------------------
+1/1 Testing: COREAI.UnitIntegration
+1/1 Test: COREAI.UnitIntegration
+Command: "/mnt/data/core-ai-build/v18/build-linux/core-ai-tests"
+Directory: /mnt/data/core-ai-build/v18/build-linux
+"COREAI.UnitIntegration" start time: Oct 06 04:13 UTC
+Output:
+----------------------------------------------------------
+PASS initialize
+PASS sqlite
+PASS new-chat
+PASS recent
+PASS recent-contains-chat
+PASS reset-chat
+PASS reset-preserves-history
+PASS memory-write
+PASS memory-search
+PASS memory-persistence-query
+PASS project-create
+PASS project-list
+PASS project-persistence
+PASS project-traversal-blocked
+PASS file-write
+PASS file-read
+PASS file-roundtrip
+PASS document-inspect
+PASS document-parser
+PASS file-traversal-blocked
+PASS library-add
+PASS library-list
+PASS library-persistence
+PASS research-local
+PASS research-provenance
+PASS task-create
+PASS task-list
+PASS task-persistence
+PASS workflow-create
+PASS workflow-list
+PASS workflow-persistence
+PASS workflow-run
+PASS schedule-create
+PASS schedule-list
+PASS schedule-persistence
+PASS schedule-run
+PASS agent-run
+PASS multi-agent-run
+PASS plugin-discovery
+PASS image-artifact
+PASS capability-registry
+PASS status
+PASS status-user-storage
+PASS doctor
+PASS restart-initialize
+PASS restart-memory
+PASS restart-memory-content
+PASS restart-projects
+PASS restart-project-content
+PASS restart-recent
+PASS restart-recent-content
+PASS user-storage-create
+PASS user-storage-user-id
+PASS user-storage-first-shard
+PASS user-storage-rollover-create
+PASS user-storage-rollover-index
+PASS user-storage-rollover-folder
+PASS user-storage-second-user
+PASS user-storage-user-isolation
+ALL LOCAL CORE-AI TESTS PASSED
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"COREAI.UnitIntegration" end time: Oct 06 04:13 UTC
+"COREAI.UnitIntegration" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 06 04:13 UTC

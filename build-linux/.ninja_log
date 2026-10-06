@@ -1,0 +1,16 @@
+# ninja log v6
+3	1077	1791260022320491812	CMakeFiles/coreai.dir/src/core/Database.cpp.o	d5aa06ce5533d737
+1077	1663	1791260023394414231	CMakeFiles/coreai.dir/src/core/Capabilities.cpp.o	1f1bad379cb7e04
+1	1859	1791260022314165717	CMakeFiles/coreai.dir/src/core/RuntimePaths.cpp.o	902941ccd62fd03d
+1	1860	1791260022318960925	CMakeFiles/coreai.dir/src/core/Config.cpp.o	e3b2bd8d407c853b
+1	2175	1791260022318754725	CMakeFiles/coreai.dir/src/core/UserStorage.cpp.o	4b860e60ffb568f3
+1	3054	1791260022318883689	CMakeFiles/coreai.dir/src/core/Logger.cpp.o	95fc712b63e4b9fb
+1860	4831	1791260024177355654	CMakeFiles/coreai.dir/src/services/LocalApiServer.cpp.o	705bb1cc0b97317a
+1663	5045	1791260023978201109	CMakeFiles/coreai.dir/src/providers/OllamaProvider.cpp.o	331081c6e26c880b
+1859	5067	1791260024174205278	CMakeFiles/coreai.dir/src/services/CoreApp.cpp.o	7005bfa7c144d8fb
+2175	5534	1791260024490212000	CMakeFiles/coreai.dir/src/services/LocalFeatures.cpp.o	eb49f7794aae9eb4
+5534	5563	1791260027846282912	libcoreai.a	1b1490862a150452
+3054	5817	1791260025371120805	CMakeFiles/core-ai.dir/src/main.cpp.o	21739316bdcb8b53
+5817	5877	1791260028130288894	core-ai	35fcee7f11355bf5
+4831	6380	1791260027146268168	CMakeFiles/core-ai-tests.dir/tests/core_tests.cpp.o	1d30d18639aaaea1
+6380	6442	1791260028694300773	core-ai-tests	6cc65f1cebc3d20

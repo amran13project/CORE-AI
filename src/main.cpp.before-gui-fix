@@ -1,0 +1,67 @@
+#include "core/CoreApp.h"
+#include "server/LocalApiServer.h"
+#include <filesystem>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+namespace {
+std::filesystem::path absoluteIfExists(const std::filesystem::path& p) {
+    std::error_code ec;
+    const auto a = std::filesystem::absolute(p, ec);
+    if (!ec && std::filesystem::exists(a / "index.html")) return a;
+    return {};
+}
+
+std::filesystem::path resolveGuiRoot(const char* argv0) {
+    std::vector<std::filesystem::path> candidates;
+    candidates.push_back(std::filesystem::current_path() / "gui");
+    std::error_code ec;
+    auto exe = std::filesystem::absolute(argv0 ? std::filesystem::path(argv0) : std::filesystem::path(), ec);
+    if (!ec) {
+        auto dir = exe.parent_path();
+        candidates.push_back(dir / "gui");
+        candidates.push_back(dir.parent_path() / "gui");
+        candidates.push_back(dir.parent_path().parent_path() / "gui");
+        candidates.push_back(dir.parent_path().parent_path().parent_path() / "gui");
+    }
+    for (const auto& candidate : candidates) {
+        if (auto found = absoluteIfExists(candidate); !found.empty()) return found;
+    }
+    return std::filesystem::absolute(std::filesystem::current_path() / "gui", ec);
+}
+}
+
+int main(int argc, char** argv) {
+    const auto guiRoot = resolveGuiRoot(argc > 0 ? argv[0] : nullptr);
+    const auto projectRoot = guiRoot.parent_path();
+    core::CoreApp app;
+    if (!app.initialize(projectRoot.string())) {
+        std::cerr << "CORE initialization failed\n";
+        return 2;
+    }
+    if (argc > 1) {
+        std::string cmd = argv[1];
+        if (cmd == "status") { std::cout << app.status() << "\n"; return 0; }
+        if (cmd == "capabilities") { std::cout << app.capabilities() << "\n"; return 0; }
+        if ((cmd == "chat" || cmd == "think" || cmd == "code" || cmd == "agent") && argc > 2) {
+            std::ostringstream q;
+            for (int i = 2; i < argc; ++i) { if (i > 2) q << ' '; q << argv[i]; }
+            const auto prompt = q.str();
+            if (cmd == "chat") std::cout << app.chat(prompt);
+            else if (cmd == "think") std::cout << app.think(prompt);
+            else if (cmd == "code") std::cout << app.code(prompt);
+            else std::cout << app.agent(prompt);
+            std::cout << '\n'; return 0;
+        }
+    }
+    core::LocalApiServer server;
+    server.start(app, 47821, guiRoot.string());
+    std::cout << "CORE AI 0.2\n"
+              << "GUI root: " << guiRoot.string() << "\n"
+              << "GUI: http://127.0.0.1:47821/\n"
+              << "Press Ctrl+C to stop.\n";
+    server.run();
+    return 0;
+}

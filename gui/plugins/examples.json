@@ -1,0 +1,7 @@
+[
+  {"id":"git","name":"Git","icon":"GIT","status":"Example","connection":"Local repository path","description":"Local Git integration example for repositories in your CORE-AI workspace."},
+  {"id":"github","name":"GitHub","icon":"GH","status":"Configurable","connection":"GITHUB_TOKEN in native backend","description":"GitHub repository, issues and pull-request connector example."},
+  {"id":"google-search","name":"Google Search","icon":"G","status":"Configurable","connection":"Google Search Engine ID (cx)","description":"Google Programmable Search example for real in-app web search results."},
+  {"id":"google-maps","name":"Google Maps","icon":"MP","status":"Ready","connection":"Google Maps URL","description":"Search places and open real Google Maps directions/search pages."},
+  {"id":"ollama","name":"Ollama","icon":"OL","status":"Connected","connection":"Local Ollama","description":"Local model provider used by CORE-AI."}
+]

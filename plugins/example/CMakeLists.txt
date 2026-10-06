@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 3.20)
-project(core_example_plugin LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 20)
-add_library(core-example-plugin SHARED plugin.cpp)
-target_include_directories(core-example-plugin PRIVATE ../../src)

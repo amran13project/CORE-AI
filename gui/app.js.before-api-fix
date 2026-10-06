@@ -1,0 +1,56 @@
+﻿(() => {
+  const K={chats:'coreai.chats.v2',current:'coreai.current.v2',settings:'coreai.settings.v2',draft:'coreai.draft.v2'};
+  const s={chats:loadChats(),current:localStorage.getItem(K.current),model:'Auto',think:false,busy:false,files:[],settings:{compact:false,rememberDraft:true,autoReset:true}};
+  const $=id=>document.getElementById(id);
+  const el={sidebar:$('sidebar'),chatList:$('chatList'),empty:$('emptyHistory'),messages:$('messages'),scroll:$('messagesScroll'),welcome:$('welcome'),message:$('message'),send:$('sendBtn'),think:$('thinkBtn'),thinkState:$('thinkState'),attach:$('attachBtn'),file:$('fileInput'),attachments:$('attachments'),model:$('modelName'),status:$('status'),backendHint:$('backendHint'),toast:$('toast')};
+  loadSettings(); ensureCurrent(); bind(); render(); health();
+
+  function loadChats(){try{return JSON.parse(localStorage.getItem(K.chats)||'[]')||[]}catch{return[]}}
+  function save(){localStorage.setItem(K.chats,JSON.stringify(s.chats));localStorage.setItem(K.current,s.current)}
+  function loadSettings(){try{Object.assign(s.settings,JSON.parse(localStorage.getItem(K.settings)||'{}'))}catch{}; $('compact').checked=s.settings.compact; $('rememberDraft').checked=s.settings.rememberDraft!==false; $('autoReset').checked=s.settings.autoReset!==false; applySettings()}
+  function applySettings(){document.body.classList.toggle('compact',s.settings.compact)}
+  function ensureCurrent(){if(s.current&&s.chats.some(c=>c.id===s.current))return; if(!s.chats.length){s.current=make('New chat').id; save(); return} s.current=s.chats[0].id; save()}
+  function id(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
+  function make(title){return{id:id(),title,createdAt:Date.now(),updatedAt:Date.now(),messages:[]}}
+  function current(){return s.chats.find(c=>c.id===s.current)}
+  function bind(){
+    $('newChat').onclick=()=>newChat(true);$('brandBtn').onclick=()=>view('chat');$('openSidebar').onclick=()=>el.sidebar.classList.add('open');$('closeSidebar').onclick=()=>el.sidebar.classList.remove('open');
+    document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{view(b.dataset.view);el.sidebar.classList.remove('open')});
+    $('searchChat').onclick=openSearch;$('closeSearch').onclick=closeSearch;$('searchOverlay').onclick=e=>{if(e.target.id==='searchOverlay')closeSearch()};$('searchInput').oninput=search;
+    $('clearChats').onclick=clearChats;
+    el.message.oninput=onInput;el.message.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}};$('composer').onsubmit=e=>{e.preventDefault();send()};
+    el.think.onclick=()=>{s.think=!s.think;syncThink()};$('thinkOn').onclick=()=>{s.think=true;syncThink();view('chat');toast('Think is ON')};
+    el.attach.onclick=()=>el.file.click();el.file.onchange=()=>{s.files=[...el.file.files];renderFiles()};
+    $('modelBtn').onclick=()=>toggle($('modelMenu'));$('moreBtn').onclick=()=>toggle($('moreMenu'));
+    document.querySelectorAll('[data-model]').forEach(b=>b.onclick=()=>{s.model=b.dataset.model;el.model.textContent=s.model;closePopovers();toast('Model: '+s.model)});
+    $('renameBtn').onclick=rename;$('exportBtn').onclick=exportChat;$('resetBtn').onclick=reset;
+    document.addEventListener('click',e=>{if(!e.target.closest('.popover')&&!e.target.closest('#modelBtn')&&!e.target.closest('#moreBtn'))closePopovers()});
+    document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch()}if(e.key==='Escape'){closeSearch();closePopovers()}});
+    $('compact').onchange=()=>{s.settings.compact=$('compact').checked;saveSettings()};$('rememberDraft').onchange=()=>{s.settings.rememberDraft=$('rememberDraft').checked;if(!s.settings.rememberDraft)localStorage.removeItem(K.draft);saveSettings()};$('autoReset').onchange=()=>{s.settings.autoReset=$('autoReset').checked;saveSettings()};
+  }
+  function saveSettings(){localStorage.setItem(K.settings,JSON.stringify(s.settings));applySettings()}
+  function newChat(focus){const c=make('New chat');s.chats.unshift(c);s.current=c.id;s.files=[];localStorage.removeItem(K.draft);save();view('chat');render();if(focus)el.message.focus()}
+  function switchChat(cid){if(!s.chats.some(c=>c.id===cid))return;s.current=cid;s.files=[];el.message.value=s.settings.rememberDraft?(localStorage.getItem(K.draft)||''):'';save();view('chat');render();el.sidebar.classList.remove('open')}
+  function view(name){$('chatView').classList.toggle('hidden',name!=='chat');$('thinkView').classList.toggle('hidden',name!=='think');$('settingsView').classList.toggle('hidden',name!=='settings');document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.view===name));if(name==='chat')el.message.focus()}
+  function render(){renderChats();renderMessages();renderFiles();syncThink();onInput()}
+  function renderChats(){el.chatList.innerHTML='';const chats=[...s.chats].sort((a,b)=>b.updatedAt-a.updatedAt).slice(0,40);el.empty.classList.toggle('hidden',!!chats.length);for(const c of chats){const b=document.createElement('button');b.className='chat'+(c.id===s.current?' active':'');b.textContent=c.title||'New chat';b.onclick=()=>switchChat(c.id);el.chatList.appendChild(b)}}
+  function renderMessages(){const c=current();const msgs=c?.messages||[];el.welcome.classList.toggle('hidden',!!msgs.length);el.messages.innerHTML='';for(const m of msgs){const a=document.createElement('article');a.className='message '+m.role+(m.error?' error':'')+(m.pending?' pending':'');const inner=document.createElement('div');inner.className='message-inner';const av=document.createElement('div');av.className='message-avatar';av.textContent=m.role==='user'?'U':'C';const box=document.createElement('div');const author=document.createElement('div');author.className='message-author';author.textContent=m.role==='user'?'You':'CORE-AI';const txt=document.createElement('div');txt.className='message-text';txt.textContent=m.content||'';box.append(author,txt);inner.append(av,box);a.append(inner);el.messages.appendChild(a)}requestAnimationFrame(()=>el.scroll.scrollTop=el.scroll.scrollHeight)}
+  function renderFiles(){el.attachments.innerHTML='';s.files.forEach((f,i)=>{const d=document.createElement('div');d.className='attachment';const t=document.createElement('span');t.textContent=f.name;const x=document.createElement('button');x.textContent='Ã—';x.onclick=()=>{s.files.splice(i,1);renderFiles()};d.append(t,x);el.attachments.append(d)})}
+  function onInput(){el.message.style.height='auto';el.message.style.height=Math.min(el.message.scrollHeight,180)+'px';el.send.disabled=!el.message.value.trim()||s.busy;if(s.settings.rememberDraft)localStorage.setItem(K.draft,el.message.value)}
+  function syncThink(){el.think.classList.toggle('on',s.think);el.thinkState.textContent=s.think?'ON':'OFF'}
+  async function send(){if(s.busy)return;const text=el.message.value.trim();if(!text)return;let c=current();if(!c){newChat(false);c=current()};const u={role:'user',content:text,createdAt:Date.now()};c.messages.push(u);if(c.messages.filter(m=>m.role==='user').length===1)c.title=text.slice(0,48)||'New chat';c.updatedAt=Date.now();save();el.message.value='';localStorage.removeItem(K.draft);s.busy=true;onInput();renderMessages();const pending={role:'assistant',content:'Thinkingâ€¦',pending:true,createdAt:Date.now()};c.messages.push(pending);renderMessages();setBusy(true);try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,conversationId:c.id,model:s.model.toLowerCase(),think:s.think,attachments:s.files.map(f=>({name:f.name,type:f.type,size:f.size}))})});const raw=await r.text();if(!r.ok)throw Error(raw||('HTTP '+r.status));const data=json(raw);const out=extract(data,raw);if(!out)throw Error('Backend returned no assistant message.');pending.content=out;pending.pending=false;pending.error=false}catch(e){pending.content='CORE-AI backend is unavailable or returned an error.\n\n'+e.message;pending.pending=false;pending.error=true}finally{c.updatedAt=Date.now();save();s.files=[];el.file.value='';s.busy=false;setBusy(false);render()}}
+  function json(x){try{return JSON.parse(x)}catch{return null}}
+  function extract(d,raw){if(typeof d==='string'&&d.trim())return d.trim();if(!d)return raw.trim();const a=[d.content,d.response,d.reply,d.text,d.message?.content,d.message,d.result?.content,d.result?.text,d.output?.text,d.output];for(const v of a)if(typeof v==='string'&&v.trim())return v.trim();return ''}
+  function setBusy(v){el.message.disabled=v;el.attach.disabled=v;if(v){el.status.classList.remove('ok','err');el.status.querySelector('span').textContent='Working'}else health()}
+  async function health(){try{const r=await fetch('/status',{cache:'no-store'});if(!r.ok)throw Error();el.status.className='status ok';el.status.querySelector('span').textContent='Connected';el.backendHint.textContent='Local CORE-AI backend'}catch{el.status.className='status err';el.status.querySelector('span').textContent='Offline';el.backendHint.textContent='Backend: not connected'}}
+  function toggle(p){closePopovers();p.classList.remove('hidden')};function closePopovers(){$('modelMenu').classList.add('hidden');$('moreMenu').classList.add('hidden')}
+  function openSearch(){$('searchOverlay').classList.remove('hidden');$('searchInput').value='';search();$('searchInput').focus()};function closeSearch(){$('searchOverlay').classList.add('hidden')}
+  function search(){const q=$('searchInput').value.toLowerCase().trim();const box=$('searchResults');box.innerHTML='';const ms=s.chats.filter(c=>!q||(c.title||'').toLowerCase().includes(q)||(c.messages||[]).some(m=>(m.content||'').toLowerCase().includes(q))).slice(0,20);if(!ms.length){const d=document.createElement('div');d.className='empty';d.textContent='No chats matched your search.';box.append(d);return}ms.forEach(c=>{const b=document.createElement('button');b.className='result';const t=document.createElement('b');t.textContent=c.title||'New chat';const d=document.createElement('small');d.textContent=new Date(c.updatedAt).toLocaleString();b.append(t,d);b.onclick=()=>{switchChat(c.id);closeSearch()};box.append(b)})}
+  function rename(){const c=current();if(!c)return;const t=prompt('Rename chat',c.title);if(t&&t.trim()){c.title=t.trim().slice(0,80);c.updatedAt=Date.now();save();renderChats();toast('Chat renamed')}closePopovers()}
+  function exportChat(){const c=current();if(!c)return;const blob=new Blob([JSON.stringify(c,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(c.title||'core-chat').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.json';a.click();URL.revokeObjectURL(a.href);closePopovers();toast('Chat exported')}
+  function reset(){const c=current();if(!c)return;c.title='New chat';c.messages=[];c.updatedAt=Date.now();save();closePopovers();view('chat');render();toast('Current chat reset')}
+  function clearChats(){if(!s.chats.length)return;if(!confirm('Clear all recent chats from this browser?'))return;s.chats=[make('New chat')];s.current=s.chats[0].id;save();render();toast('Recent chats cleared')}
+  let timer;function toast(m){clearTimeout(timer);el.toast.textContent=m;el.toast.classList.add('show');timer=setTimeout(()=>el.toast.classList.remove('show'),2200)}
+})();
+
+
