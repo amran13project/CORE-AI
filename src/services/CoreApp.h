@@ -54,7 +54,7 @@ public:
     const RuntimePaths& paths()const{return paths_;}
     bool initialized()const{return initialized_;}
     const Database& db()const{return db_;}
-    int apiPort()const{return 47821;}
+    int apiPort() const { const char* e=std::getenv("PORT"); if(!e||!*e)return 47821; char* end=nullptr; long p=std::strtol(e,&end,10); return (end==e||*end!="\0"||p<1||p>65535)?47821:(int)p; }
     Result<void> startApi(const std::filesystem::path& web_root);
     void stopApi();
 private:

@@ -154,7 +154,7 @@ Result<std::string> CoreApp::directions(const std::string& a,const std::string& 
 Result<void> CoreApp::startApi(const std::filesystem::path& web_root){
     if(api_) return Result<void>::success();
     api_=std::make_unique<LocalApiServer>(*this);
-    auto r=api_->start(47821,web_root);
+    auto r=api_->start(apiPort(),web_root);
     if(!r.ok()) api_.reset();
     return r;
 } void CoreApp::stopApi(){if(api_){api_->stop();api_.reset();}}

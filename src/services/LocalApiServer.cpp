@@ -44,7 +44,7 @@ static std::string field(const std::string&j,const std::string&k){
     if(p>=j.size()||j[p]!='\"')return{}; ++p; std::string out; bool escp=false;
     for(;p<j.size();++p){char c=j[p];if(escp){if(c=='n')out+='\n';else if(c=='r')out+='\r';else if(c=='t')out+='\t';else out+=c;escp=false;continue;}if(c=='\\'){escp=true;continue;}if(c=='\"')break;out+=c;}return out;
 }
-static std::string resp(int code,const std::string&type,const std::string&body){return "HTTP/1.1 "+std::to_string(code)+(code==200?" OK":code==404?" Not Found":code==403?" Forbidden":" Error")+"\r\nContent-Type: "+type+"\r\nContent-Length: "+std::to_string(body.size())+"\r\nAccess-Control-Allow-Origin: http://127.0.0.1:47821\r\nConnection: close\r\n\r\n"+body;}
+static std::string resp(int code,const std::string&type,const std::string&body){return "HTTP/1.1 "+std::to_string(code)+(code==200?" OK":code==404?" Not Found":code==403?" Forbidden":" Error")+"\r\nContent-Type: "+type+"\r\nContent-Length: "+std::to_string(body.size())+"\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n"+body;}
 LocalApiServer::LocalApiServer(CoreApp&a):app_(a){} LocalApiServer::~LocalApiServer(){stop();}
 Result<void> LocalApiServer::start(int p,const std::filesystem::path& root){
     if(running_) return Result<void>::success();
@@ -67,7 +67,7 @@ void LocalApiServer::runLoop(){
 #ifdef _WIN32
 WSADATA w{};if(WSAStartup(MAKEWORD(2,2),&w)!=0){running_=false;return;}
 #endif
-sock_t s=socket(AF_INET,SOCK_STREAM,0);if(!good(s)){running_=false;return;}int one=1;setsockopt(s,SOL_SOCKET,SO_REUSEADDR,(char*)&one,sizeof(one));sockaddr_in a{};a.sin_family=AF_INET;a.sin_addr.s_addr=htonl(INADDR_LOOPBACK);a.sin_port=htons((uint16_t)port_);if(bind(s,(sockaddr*)&a,sizeof(a))<0){close_sock(s);running_=false;return;}if(listen(s,8)<0){close_sock(s);running_=false;return;}while(running_){sockaddr_in c{};
+sock_t s=socket(AF_INET,SOCK_STREAM,0);if(!good(s)){running_=false;return;}int one=1;setsockopt(s,SOL_SOCKET,SO_REUSEADDR,(char*)&one,sizeof(one));sockaddr_in a{};a.sin_family=AF_INET;a.sin_addr.s_addr=htonl(INADDR_ANY);a.sin_port=htons((uint16_t)port_);if(bind(s,(sockaddr*)&a,sizeof(a))<0){close_sock(s);running_=false;return;}if(listen(s,8)<0){close_sock(s);running_=false;return;}while(running_){sockaddr_in c{};
 #ifdef _WIN32
 int cl=sizeof(c);
 #else

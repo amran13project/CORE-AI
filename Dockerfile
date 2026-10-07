@@ -13,7 +13,7 @@ COPY . .
 
 RUN cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCORE_BUILD_TESTS=OFF
+    -DCOREAI_BUILD_TESTS=OFF`r`n    -DCOREAI_BUILD_NATIVE_GUI=OFF
 
 RUN cmake --build build -j2
 
@@ -28,7 +28,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 COPY --from=build /app/build/core-ai /app/core-ai
-COPY --from=build /app/gui /app/gui
+COPY --from=build /app/web /app/gui
 
 ENV PORT=10000
 
