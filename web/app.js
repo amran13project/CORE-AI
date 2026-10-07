@@ -61,7 +61,49 @@ async function renderWorkspace(){
 }
 async function loadRecent(){try{const j=await api('/conversations/recent');state.recent=Array.isArray(j)?j:[]}catch{state.recent=[]}renderRecentList()}
 function renderRecentList(){const box=$('#recentList');box.innerHTML=state.recent.slice(0,18).map(x=>`<button class="recent-item" title="${esc(x.title)}" data-recent-id="${esc(x.id)}">${esc(x.title||'Untitled conversation')}</button>`).join('')||'<div class="muted" style="padding:6px 10px">No recent chats</div>';box.querySelectorAll('[data-recent-id]').forEach(b=>b.onclick=()=>{state.section='chat';render()})}
-async function refresh(){try{const s=await api('/status');$('#status').textContent=`${s.ollama_reachable?'Ollama READY':'Ollama UNAVAILABLE'} Â· ${s.privacy_mode} Â· ${s.model||'No model selected'}`;$('#storageLabel').textContent=s.storage_shard?`Local Â· ${s.storage_shard}`:'Local storage';if(s.model){$('#model').innerHTML=`<option value="${esc(s.model)}">${esc(s.model)}</option>`}}catch(e){$('#status').textContent=`Core OFFLINE Â· ${e.message}`}}
+async function refresh(){
+  try{
+    const s=await api('/status');
+    const publicMode=location.hostname.endsWith('onrender.com') || location.hostname!=='127.0.0.1' && location.hostname!=='localhost';
+
+    const providerStatus=s.ollama_reachable
+      ? `AI READY · ${s.model||'model'}`
+      : (publicMode ? 'AI provider not configured' : 'AI provider unavailable');
+
+    $('#status').textContent=`CORE-AI Online · ${providerStatus}`;
+
+    $('#storageLabel').textContent=
+      publicMode ? 'Public web'
+      : (s.storage_shard ? `Local · ${s.storage_shard}` : 'Local storage');
+
+    const model=$('#model');
+    model.innerHTML='';
+
+    const opt=document.createElement('option');
+
+    if(s.ollama_reachable && s.model){
+      opt.value=s.model;
+      opt.textContent=s.model;
+      opt.disabled=false;
+    }else{
+      opt.value='';
+      opt.textContent='No AI provider';
+      opt.disabled=true;
+    }
+
+    model.appendChild(opt);
+  }catch(e){
+    $('#status').textContent=`CORE-AI Offline · ${e.message}`;
+    $('#storageLabel').textContent='Connection unavailable';
+
+    const model=$('#model');
+    model.innerHTML='';
+    const opt=document.createElement('option');
+    opt.textContent='Backend offline';
+    opt.disabled=true;
+    model.appendChild(opt);
+  }
+}
 async function sendMessage(){
   if(state.busy)return;const input=$('#input'),text=input.value.trim();if(!text)return;
   const mode=state.think?'think':'chat';state.lastRequest={prompt:text,mode};state.messages.push({role:'user',text});input.value='';input.style.height='auto';renderComposer();

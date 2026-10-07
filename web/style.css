@@ -114,3 +114,8 @@ nav button:hover,nav button.active{background:#252525;color:#f3f3f3}
 @media(prefers-reduced-motion:reduce){.runner,.obstacle{animation:none}.runner{left:20px}}
 @media(max-width:900px){.app-shell{grid-template-columns:230px 1fr}.chat-column{width:min(760px,calc(100% - 24px))}.composer-wrap{padding-left:9px;padding-right:9px}}
 @media(max-width:720px){.app-shell{grid-template-columns:1fr}.sidebar{position:fixed;left:0;top:0;bottom:0;width:278px;transform:translateX(-101%);transition:transform .18s ease;box-shadow:16px 0 40px rgba(0,0,0,.35)}body.sidebar-open .sidebar{transform:translateX(0)}.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:15}.mobile-only{display:grid}body.sidebar-open .sidebar-backdrop{display:block}.topbar{padding:0 10px}.topbar-right .icon-button{display:none}.model-control select{max-width:140px}.chat-column{padding-top:26px}.composer-tool{display:none}.composer-meta{display:none}.composer-footnote{font-size:7px}}
+
+.model-control select:disabled{
+  opacity:.75;
+  cursor:not-allowed;
+}
