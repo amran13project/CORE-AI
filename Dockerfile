@@ -13,7 +13,8 @@ COPY . .
 
 RUN cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCOREAI_BUILD_TESTS=OFF`r`n    -DCOREAI_BUILD_NATIVE_GUI=OFF
+    -DCOREAI_BUILD_TESTS=OFF \
+    -DCOREAI_BUILD_NATIVE_GUI=OFF
 
 RUN cmake --build build -j2
 
@@ -22,7 +23,8 @@ FROM ubuntu:24.04
 RUN apt-get update && \
     apt-get install -y \
     curl \
-    ca-certificates && \
+    ca-certificates \
+    libsqlite3-0 && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

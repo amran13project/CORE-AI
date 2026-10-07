@@ -104,6 +104,18 @@ Result<std::string> CoreApp::projectCreate(const std::string&name){if(name.empty
     if(root.parent_path()!=approved_root)
         return Result<std::string>::failure(error(ErrorCode::PermissionDenied,"project path outside approved root","projects","create"));std::error_code ec;std::filesystem::create_directories(root,ec);if(ec)return Result<std::string>::failure(error(ErrorCode::StorageOpenFailed,ec.message(),"projects","create",true));std::ofstream(root/"project.core.json")<<"{\"schema\":1,\"id\":\""<<i<<"\",\"name\":\""<<esc(name)<<"\"}\n";auto r=db_.exec("INSERT INTO projects(id,name,root,created_at,updated_at) VALUES('"+sqlEsc(i)+"','"+sqlEsc(name)+"','"+sqlEsc(root.string())+"',"+std::to_string(now)+","+std::to_string(now)+")");if(!r.ok())return Result<std::string>::failure(r.error());return Result<std::string>::success(i);}
 Result<std::string> CoreApp::projectList()const{auto r=db_.query("SELECT id,name,root,updated_at FROM projects ORDER BY updated_at DESC");if(!r.ok())return Result<std::string>::failure(r.error());std::ostringstream o;o<<"[";for(size_t i=0;i<r.value().size();++i){auto&v=r.value()[i].values;if(i)o<<',';o<<"{\"id\":\""<<esc(v[0])<<"\",\"name\":\""<<esc(v[1])<<"\",\"root\":\""<<esc(v[2])<<"\",\"updated_at\":"<<v[3]<<"}";}o<<"]";return Result<std::string>::success(o.str());}
+int CoreApp::apiPort() const{
+    const char* e=std::getenv("PORT");
+    if(!e||!*e) return 47821;
+
+    char* end=nullptr;
+    const long p=std::strtol(e,&end,10);
+
+    if(end==e || *end!='\0' || p<1 || p>65535)
+        return 47821;
+
+    return static_cast<int>(p);
+}
 Result<void> CoreApp::setModel(const std::string&m){if(m.empty())return Result<void>::failure(error(ErrorCode::InvalidArgument,"model required","models","select"));selected_model_=m;config_.set("model",m);return config_.save(paths_.config()/"core.config");}
 Result<std::string> CoreApp::status()const{std::ostringstream o;auto reach=ollama_&&ollama_->reachable();const auto& us=paths_.userStorage();o<<"{\"version\":\"0.3.2\",\"initialized\":"<<(initialized_?"true":"false")<<",\"model\":\""<<esc(selected_model_)<<"\",\"ollama_reachable\":"<<(reach?"true":"false")<<",\"storage\":"<<(db_.available()?"true":"false")<<",\"storage_user\":\""<<esc(us.user_id)<<"\",\"storage_shard\":"<<us.shard_index<<",\"storage_quota_bytes\":"<<us.logical_quota_bytes<<",\"storage_shard_path\":\""<<esc(us.shard_root.string())<<"\",\"privacy_mode\":\""<<esc(config_.get("privacy.mode","Local Only"))<<"\",\"api\":{\"host\":\"127.0.0.1\",\"port\":47821}}";return Result<std::string>::success(o.str());}
 std::string CoreApp::doctor() const{
